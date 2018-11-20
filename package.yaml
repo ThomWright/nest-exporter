@@ -24,6 +24,13 @@ dependencies:
 
 library:
   source-dirs: src
+  ghc-options:
+    - -Wall
+    - -Werror
+    - -Wcompat
+    - -Wincomplete-record-updates
+    - -Wincomplete-uni-patterns
+    - -Wredundant-constraints
 
 executables:
   nest-exporter:
@@ -33,8 +40,15 @@ executables:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
+    - -Wall
+    - -Werror
+    - -Wcompat
+    - -Wincomplete-record-updates
+    - -Wincomplete-uni-patterns
+    - -Wredundant-constraints
     dependencies:
     - nest-exporter
+    - optparse-applicative == 0.14.*
 
 tests:
   nest-exporter-test:
