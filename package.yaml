@@ -1,7 +1,7 @@
 name:                nest-exporter
 version:             0.1.0.0
 github:              "ThomWright/nest-exporter"
-license:             BSD3
+license:             GPL-3.0-only
 author:              "Thom Wright"
 maintainer:          "git@thomwright.co.uk"
 copyright:           "2018 Thom Wright"
