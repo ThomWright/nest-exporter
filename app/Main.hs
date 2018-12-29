@@ -1,10 +1,15 @@
+{-# LANGUAGE NamedFieldPuns #-}
+
 module Main where
 
-import           Config              (configParser)
+import           Config              as Config (AppConfig (..), NestConfig (..),
+                                                clientId, clientSecret, nest,
+                                                parser, pinCode)
 import           Data.Ini.Config     (parseIniFile)
 import           Data.Semigroup      ((<>))
 import qualified Data.Text.IO        as TIO
 import           Lib                 (doNestStuff)
+import           Nest                (NestAuth (..))
 import           Options.Applicative (Parser, ParserInfo, execParser, fullDesc,
                                       header, help, helper, info, long, metavar,
                                       progDesc, short, showDefault, strOption,
@@ -14,11 +19,14 @@ main :: IO ()
 main = do
   (CmdLineOptions filepath) <- execParser opts
   configFile <- TIO.readFile filepath
-  case parseIniFile configFile configParser of
+  case parseIniFile configFile Config.parser of
     Left err -> putStrLn $ "Error parsing config file: " ++ err
-    Right config -> do
+    Right config@AppConfig {nest = NestConfig { Config.clientId
+                                              , Config.clientSecret
+                                              , Config.pinCode
+                                              }} -> do
       print config
-      doNestStuff
+      doNestStuff (NestAuth clientId clientSecret pinCode)
 
 newtype CmdLineOptions = CmdLineOptions
   { configFilePath :: FilePath

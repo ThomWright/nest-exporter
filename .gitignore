@@ -1,4 +1,6 @@
 .stack-work/
 nest-exporter.cabal
 config.ini
+access-token.json
+tmp
 *~
