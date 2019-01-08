@@ -1,7 +1,7 @@
 {-# LANGUAGE DeriveGeneric  #-}
 {-# LANGUAGE NamedFieldPuns #-}
 
-module Nest
+module Nest.Api
   ( NestAuth(..)
   , fetchAccessToken
   , AccessTokenResponse(..)
