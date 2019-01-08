@@ -9,7 +9,7 @@ import           Data.Ini.Config     (parseIniFile)
 import           Data.Semigroup      ((<>))
 import qualified Data.Text.IO        as TIO
 import           Lib                 (doNestStuff)
-import           Nest.Api                (NestAuth (..))
+import           Nest.Api            (NestAuth (..))
 import           Options.Applicative (Parser, ParserInfo, execParser, fullDesc,
                                       header, help, helper, info, long, metavar,
                                       progDesc, short, showDefault, strOption,
@@ -24,8 +24,9 @@ main = do
     Right config@AppConfig {nest = NestConfig { Config.clientId
                                               , Config.clientSecret
                                               , Config.pinCode
-                                              }} -> do
+                                              }}
       -- print config
+     -> do
       doNestStuff (NestAuth clientId clientSecret pinCode)
 
 newtype CmdLineOptions = CmdLineOptions

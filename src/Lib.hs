@@ -4,8 +4,8 @@ module Lib
   ( doNestStuff
   ) where
 
-import           Nest.Api                    (NestAuth)
-import Nest.AccessToken (getAccessToken)
+import           Nest.AccessToken        (getAccessToken)
+import           Nest.Api                (NestAuth)
 import           Network.HTTP.Client
 import           Network.HTTP.Client.TLS (setGlobalManager, tlsManagerSettings)
 
