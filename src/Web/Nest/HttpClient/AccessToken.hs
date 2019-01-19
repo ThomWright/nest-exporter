@@ -1,41 +1,29 @@
 {-# LANGUAGE DeriveGeneric  #-}
 {-# LANGUAGE NamedFieldPuns #-}
 
-module Nest.Api
-  ( NestAuth(..)
-  , fetchAccessToken
+module Web.Nest.HttpClient.AccessToken
+  ( fetchAccessToken
   , AccessTokenResponse(..)
   , AccessTokenSuccess(..)
-  , NestApiError(..)
   ) where
 
-import           Data.Aeson            (FromJSON, Value (Object), parseJSON,
-                                        withObject, (.:))
-import qualified Data.Aeson.Types      as AesonTypes
-import qualified Data.ByteString.Char8 as S8
-import           Data.HashMap.Lazy     (member)
-import           Data.Text             (Text)
+import           Data.Aeson                (FromJSON, Value (Object), parseJSON,
+                                            withObject, (.:))
+import qualified Data.ByteString.Char8     as S8
+import           Data.HashMap.Lazy         (member)
+import           Data.Text                 (Text)
 import           GHC.Generics
 import           Network.HTTP.Client
 import           Network.HTTP.Simple
-
-nestHost :: String
-nestHost = "api.home.nest.com"
+import           Web.Nest.HttpClient.Auth  (NestAuth (..))
+import           Web.Nest.HttpClient.Base  (defaultSecureRequest, nestHost)
+import           Web.Nest.HttpClient.Error (NestApiError)
 
 nestOauthPath :: String
 nestOauthPath = "/oauth2"
 
 nestAccessTokenPath :: String
 nestAccessTokenPath = nestOauthPath ++ "/access_token"
-
-defaultSecureRequest :: Request
-defaultSecureRequest = setRequestSecure True $ setRequestPort 443 defaultRequest
-
-data NestAuth = NestAuth
-  { clientId     :: String
-  , clientSecret :: String
-  , code         :: String
-  } deriving (Eq, Show)
 
 -- |Request for an access token
 accessTokenRequest :: NestAuth -> Request
@@ -65,13 +53,10 @@ instance FromJSON AccessTokenResponse where
   parseJSON =
     withObject
       "AccessTokenResponse"
-      (\v -> parseAccessTokenResponse (member "error" v) (Object v))
-
-parseAccessTokenResponse ::
-     Bool -> Value -> AesonTypes.Parser AccessTokenResponse
-parseAccessTokenResponse hasError value
-  | hasError = Error <$> parseJSON value
-  | otherwise = Success <$> parseJSON value
+      (\v ->
+         if member "error" v
+           then Error <$> parseJSON (Object v)
+           else Success <$> parseJSON (Object v))
 
 data AccessTokenSuccess = AccessTokenSuccess
   { accessToken :: Text
@@ -82,11 +67,3 @@ instance FromJSON AccessTokenSuccess where
   parseJSON =
     withObject "AccessTokenSuccess" $ \v ->
       AccessTokenSuccess <$> v .: "access_token" <*> v .: "expired_in"
-
-data NestApiError = NestApiError
-  { error             :: Text
-  , instance_id       :: Text
-  , error_description :: Text
-  } deriving (Eq, Generic, Show)
-
-instance FromJSON NestApiError

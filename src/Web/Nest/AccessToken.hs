@@ -1,18 +1,18 @@
 {-# LANGUAGE NamedFieldPuns #-}
 
-module Nest.AccessToken
+module Web.Nest.AccessToken
   ( getAccessToken
   ) where
 
-import           Control.Exception    (tryJust)
-import           Control.Monad        (guard)
-import           Data.Aeson           (decode, encode)
-import qualified Data.ByteString.Lazy as LBS
-import           Data.Text            (Text)
-import           Nest.Api             (AccessTokenResponse (..),
-                                       AccessTokenSuccess (..), NestAuth,
-                                       error_description, fetchAccessToken)
-import           System.IO.Error      (isDoesNotExistError)
+import           Control.Exception       (tryJust)
+import           Control.Monad           (guard)
+import           Data.Aeson              (decode, encode)
+import qualified Data.ByteString.Lazy    as LBS
+import           Data.Text               (Text)
+import           System.IO.Error         (isDoesNotExistError)
+import           Web.Nest.HttpClient.Api (AccessTokenResponse (..),
+                                          AccessTokenSuccess (..), NestAuth,
+                                          error_description, fetchAccessToken)
 
 accessTokenFile :: FilePath
 accessTokenFile = "access-token.json"
