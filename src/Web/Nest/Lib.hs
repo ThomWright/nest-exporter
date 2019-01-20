@@ -5,9 +5,9 @@ module Web.Nest.Lib
   ) where
 
 import           Network.HTTP.Client
-import           Network.HTTP.Client.TLS (setGlobalManager, tlsManagerSettings)
-import           Web.Nest.AccessToken    (getAccessToken)
-import           Web.Nest.HttpClient.Api (NestAuth)
+import           Network.HTTP.Client.TLS  (setGlobalManager, tlsManagerSettings)
+import           Web.Nest.AccessToken     (getAccessToken)
+import           Web.Nest.HttpClient.Auth (NestAuth)
 
 doNestStuff :: NestAuth -> IO ()
 doNestStuff nestAuth = do

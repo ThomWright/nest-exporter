@@ -1,29 +1,35 @@
 {-# LANGUAGE DeriveGeneric  #-}
 {-# LANGUAGE NamedFieldPuns #-}
+{-# LANGUAGE TypeFamilies   #-}
 
 module Web.Nest.HttpClient.AccessToken
-  ( fetchAccessToken
-  , AccessTokenResponse(..)
-  , AccessTokenSuccess(..)
+  ( getAccessTokenReq
+  , AccessTokenResponseBody(..)
   ) where
 
-import           Data.Aeson                (FromJSON, Value (Object), parseJSON,
-                                            withObject, (.:))
-import qualified Data.ByteString.Char8     as S8
-import           Data.HashMap.Lazy         (member)
-import           Data.Text                 (Text)
+import           Data.Aeson                  (FromJSON, parseJSON, withObject,
+                                              (.:))
+import qualified Data.ByteString.Char8       as S8
+import           Data.Text                   (Text)
 import           GHC.Generics
 import           Network.HTTP.Client
 import           Network.HTTP.Simple
-import           Web.Nest.HttpClient.Auth  (NestAuth (..))
-import           Web.Nest.HttpClient.Base  (defaultSecureRequest, nestHost)
-import           Web.Nest.HttpClient.Error (NestApiError)
+import           Web.Nest.HttpClient.Auth    (NestAuth (..))
+import           Web.Nest.HttpClient.Base    (defaultSecureRequest, nestHost)
+import           Web.Nest.HttpClient.Request (NestRequest (..), NestReturn)
 
 nestOauthPath :: String
 nestOauthPath = "/oauth2"
 
 nestAccessTokenPath :: String
 nestAccessTokenPath = nestOauthPath ++ "/access_token"
+
+getAccessTokenReq :: NestAuth -> NestRequest NestAccessToken
+getAccessTokenReq auth = NestRequest (accessTokenRequest auth)
+
+data NestAccessToken
+
+type instance NestReturn NestAccessToken = AccessTokenResponseBody
 
 -- |Request for an access token
 accessTokenRequest :: NestAuth -> Request
@@ -39,31 +45,12 @@ accessTokenRequest NestAuth {clientId, clientSecret, code} =
     ]
     defaultSecureRequest
 
-fetchAccessToken :: NestAuth -> IO AccessTokenResponse
-fetchAccessToken nestAuth = do
-  response <- httpJSON (accessTokenRequest nestAuth)
-  return (getResponseBody response :: AccessTokenResponse)
-
-data AccessTokenResponse
-  = Success AccessTokenSuccess
-  | Error NestApiError
-  deriving (Eq, Show)
-
-instance FromJSON AccessTokenResponse where
-  parseJSON =
-    withObject
-      "AccessTokenResponse"
-      (\v ->
-         if member "error" v
-           then Error <$> parseJSON (Object v)
-           else Success <$> parseJSON (Object v))
-
-data AccessTokenSuccess = AccessTokenSuccess
+data AccessTokenResponseBody = AccessTokenResponseBody
   { accessToken :: Text
   , expiresIn   :: Int
   } deriving (Eq, Generic, Show)
 
-instance FromJSON AccessTokenSuccess where
+instance FromJSON AccessTokenResponseBody where
   parseJSON =
-    withObject "AccessTokenSuccess" $ \v ->
-      AccessTokenSuccess <$> v .: "access_token" <*> v .: "expired_in"
+    withObject "AccessTokenResponseBody" $ \v ->
+      AccessTokenResponseBody <$> v .: "access_token" <*> v .: "expires_in"

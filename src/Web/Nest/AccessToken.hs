@@ -4,15 +4,17 @@ module Web.Nest.AccessToken
   ( getAccessToken
   ) where
 
-import           Control.Exception       (tryJust)
-import           Control.Monad           (guard)
-import           Data.Aeson              (decode, encode)
-import qualified Data.ByteString.Lazy    as LBS
-import           Data.Text               (Text)
-import           System.IO.Error         (isDoesNotExistError)
-import           Web.Nest.HttpClient.Api (AccessTokenResponse (..),
-                                          AccessTokenSuccess (..), NestAuth,
-                                          error_description, fetchAccessToken)
+import           Control.Exception               (tryJust)
+import           Control.Monad                   (guard)
+import           Data.Aeson                      (decode, encode)
+import qualified Data.ByteString.Lazy            as LBS
+import           Data.Text                       (Text, pack)
+import           System.IO.Error                 (isDoesNotExistError)
+import           Web.Nest.HttpClient.AccessToken (AccessTokenResponseBody (..),
+                                                  getAccessTokenReq)
+import           Web.Nest.HttpClient.Auth        (NestAuth)
+import           Web.Nest.HttpClient.Error       (NestError (..), body)
+import           Web.Nest.HttpClient.Request     (sendRequest)
 
 accessTokenFile :: FilePath
 accessTokenFile = "access-token.json"
@@ -31,16 +33,22 @@ getAccessToken nestAuth = do
 
 getAccessTokenFromApi :: NestAuth -> IO (Either Text Text)
 getAccessTokenFromApi nestAuth = do
-  response <- fetchAccessToken nestAuth
+  response <- sendRequest (getAccessTokenReq nestAuth)
   case response of
-    Error e ->
-      return $
-      Left
-        (("Error fetching access token from API: " :: Text) <>
-         error_description e)
-    Success a -> do
-      let AccessTokenSuccess {accessToken} = a
-      -- write access token to cache file
+    Left e ->
+      case e of
+        ApiError ae ->
+          return
+            (Left
+               (("Error fetching access token from API: " :: Text) <>
+                (pack . show . body) ae))
+        ParseFailure pf -> return (Left (("ParseFailure: " :: Text) <> pf))
+        UnknownStatusCode status ->
+          return
+            (Left (("UnknownStatusCode: " :: Text) <> (pack $ show status)))
+    Right a -> do
+      let AccessTokenResponseBody {accessToken} = a
+          -- write access token to cache file
       LBS.writeFile accessTokenFile (encode accessToken)
       return (Right accessToken)
 

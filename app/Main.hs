@@ -2,19 +2,19 @@
 
 module Main where
 
-import           Config                  as Config (AppConfig (..),
-                                                    NestConfig (..), clientId,
-                                                    clientSecret, nest, parser,
-                                                    pinCode)
-import           Data.Ini.Config         (parseIniFile)
-import           Data.Semigroup          ((<>))
-import qualified Data.Text.IO            as TIO
-import           Options.Applicative     (Parser, ParserInfo, execParser,
-                                          fullDesc, header, help, helper, info,
-                                          long, metavar, progDesc, short,
-                                          showDefault, strOption, value)
-import           Web.Nest.HttpClient.Api (NestAuth (..))
-import           Web.Nest.Lib            (doNestStuff)
+import           Config                   as Config (AppConfig (..),
+                                                     NestConfig (..), clientId,
+                                                     clientSecret, nest, parser,
+                                                     pinCode)
+import           Data.Ini.Config          (parseIniFile)
+import           Data.Semigroup           ((<>))
+import qualified Data.Text.IO             as TIO
+import           Options.Applicative      (Parser, ParserInfo, execParser,
+                                           fullDesc, header, help, helper, info,
+                                           long, metavar, progDesc, short,
+                                           showDefault, strOption, value)
+import           Web.Nest.HttpClient.Auth (NestAuth (..))
+import           Web.Nest.Lib             (doNestStuff)
 
 main :: IO ()
 main = do
