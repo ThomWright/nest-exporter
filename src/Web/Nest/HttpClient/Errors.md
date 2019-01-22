@@ -4,7 +4,7 @@ From the Nest Api docs:
 
 Example:
 
-```
+```json
 {
   "error": "Temperature '$temp' is in wrong format",
   "type": "https://developers.nest.com/documentation/cloud/error-messages#format-error",
