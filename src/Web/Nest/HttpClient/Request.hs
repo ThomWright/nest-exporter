@@ -1,11 +1,8 @@
-{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE NamedFieldPuns   #-}
-{-# LANGUAGE TypeFamilies     #-}
 
 module Web.Nest.HttpClient.Request
   ( sendRequest
-  , NestRequest(..)
-  , NestReturn
+  , NestRequest
   ) where
 
 import           Data.Aeson                (FromJSON, eitherDecode')
@@ -15,18 +12,14 @@ import           Network.HTTP.Simple       (getResponseBody,
                                             getResponseStatusCode, httpLBS)
 import           Web.Nest.HttpClient.Error (NestApiError (..), NestError (..))
 
-data NestRequest a = NestRequest
-  { req_ :: Request
-  }
-
-type family NestReturn a :: *
+type NestRequest a = Request
 
 sendRequest ::
-     (FromJSON (NestReturn a))
+     (FromJSON a)
   => NestRequest a
-  -> IO (Either NestError (NestReturn a))
+  -> IO (Either NestError a)
 sendRequest req = do
-  response <- httpLBS (req_ req)
+  response <- httpLBS req
   let status = getResponseStatusCode response
   let body = getResponseBody response
   return

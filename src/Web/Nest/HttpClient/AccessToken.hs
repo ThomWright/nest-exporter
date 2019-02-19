@@ -1,6 +1,5 @@
 {-# LANGUAGE DeriveGeneric  #-}
 {-# LANGUAGE NamedFieldPuns #-}
-{-# LANGUAGE TypeFamilies   #-}
 
 module Web.Nest.HttpClient.AccessToken
   ( getAccessTokenReq
@@ -12,11 +11,10 @@ import           Data.Aeson                  (FromJSON, parseJSON, withObject,
 import qualified Data.ByteString.Char8       as S8
 import           Data.Text                   (Text)
 import           GHC.Generics
-import           Network.HTTP.Client
 import           Network.HTTP.Simple
 import           Web.Nest.HttpClient.Auth    (NestAuth (..))
 import           Web.Nest.HttpClient.Base    (defaultSecureRequest, nestHost)
-import           Web.Nest.HttpClient.Request (NestRequest (..), NestReturn)
+import           Web.Nest.HttpClient.Request (NestRequest)
 
 nestOauthPath :: String
 nestOauthPath = "/oauth2"
@@ -24,16 +22,8 @@ nestOauthPath = "/oauth2"
 nestAccessTokenPath :: String
 nestAccessTokenPath = nestOauthPath ++ "/access_token"
 
-getAccessTokenReq :: NestAuth -> NestRequest NestAccessToken
-getAccessTokenReq auth = NestRequest (accessTokenRequest auth)
-
-data NestAccessToken
-
-type instance NestReturn NestAccessToken = AccessTokenResponseBody
-
--- |Request for an access token
-accessTokenRequest :: NestAuth -> Request
-accessTokenRequest NestAuth {clientId, clientSecret, code} =
+getAccessTokenReq :: NestAuth -> NestRequest AccessTokenResponseBody
+getAccessTokenReq NestAuth {clientId, clientSecret, code} =
   setRequestHost (S8.pack nestHost) $
   setRequestPath (S8.pack nestAccessTokenPath) $
   setRequestMethod "POST" $
