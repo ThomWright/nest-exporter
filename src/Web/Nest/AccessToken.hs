@@ -4,24 +4,24 @@ module Web.Nest.AccessToken
   ( getAccessToken
   ) where
 
-import           Data.Text                       (Text, pack)
-import           Web.Nest.FileCache              (withFileCache)
-import           Web.Nest.HttpClient.AccessToken (AccessTokenResponseBody (..),
-                                                  getAccessTokenReq)
-import           Web.Nest.HttpClient.Auth        (NestAuth)
-import           Web.Nest.HttpClient.Error       (NestError (..), body)
-import           Web.Nest.HttpClient.Request     (sendRequest)
+import           Data.Text                        (Text, pack)
+import           Web.Nest.FileCache               (withFileCache)
+import           Web.Nest.HttpClient.AccessToken  (AccessTokenResponseBody (..),
+                                                   getAccessTokenReq)
+import           Web.Nest.HttpClient.Auth         (NestAuth)
+import           Web.Nest.HttpClient.Error        (NestError (..), body)
+import           Web.Nest.HttpClient.RequestState (HostStateRef, request)
 
 accessTokenFile :: FilePath
 accessTokenFile = "access-token.json"
 
-getAccessToken :: NestAuth -> IO (Either Text Text)
-getAccessToken nestAuth =
-  withFileCache accessTokenFile (getAccessTokenFromApi nestAuth)
+getAccessToken :: HostStateRef -> NestAuth -> IO (Either Text Text)
+getAccessToken hostStateRef nestAuth =
+  withFileCache accessTokenFile (getAccessTokenFromApi hostStateRef nestAuth)
 
-getAccessTokenFromApi :: NestAuth -> IO (Either Text Text)
-getAccessTokenFromApi nestAuth = do
-  response <- sendRequest (getAccessTokenReq nestAuth)
+getAccessTokenFromApi :: HostStateRef -> NestAuth -> IO (Either Text Text)
+getAccessTokenFromApi hostStateRef nestAuth = do
+  response <- request hostStateRef (getAccessTokenReq nestAuth)
   case response of
     Left e ->
       case e of

@@ -13,7 +13,7 @@ import           Data.Text                   (Text)
 import           GHC.Generics
 import           Network.HTTP.Simple
 import           Web.Nest.HttpClient.Auth    (NestAuth (..))
-import           Web.Nest.HttpClient.Base    (defaultSecureRequest, nestHost)
+import           Web.Nest.HttpClient.Base    (defaultSecureRequest)
 import           Web.Nest.HttpClient.Request (NestRequest)
 
 nestOauthPath :: String
@@ -24,7 +24,6 @@ nestAccessTokenPath = nestOauthPath ++ "/access_token"
 
 getAccessTokenReq :: NestAuth -> NestRequest AccessTokenResponseBody
 getAccessTokenReq NestAuth {clientId, clientSecret, code} =
-  setRequestHost (S8.pack nestHost) $
   setRequestPath (S8.pack nestAccessTokenPath) $
   setRequestMethod "POST" $
   setRequestBodyURLEncoded
