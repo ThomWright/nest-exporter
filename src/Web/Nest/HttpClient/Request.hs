@@ -10,12 +10,10 @@ module Web.Nest.HttpClient.Request
 import           Data.Aeson                (FromJSON, eitherDecode')
 import           Data.Text                 (pack)
 
--- import qualified Data.ByteString.Char8       as S8
 import qualified Data.ByteString.Lazy      as LBS
 import           Network.HTTP.Client       (Request, Response, responseHeaders)
 import           Network.HTTP.Types.Header (hLocation)
 
--- import           Network.HTTP.Client       (Request)
 import           Network.HTTP.Simple       (getResponseBody,
                                             getResponseStatusCode, httpLBS,
                                             setRequestHost)
@@ -33,23 +31,12 @@ data RedirectOrResponse a
 sendRequest ::
      (FromJSON a) => Host -> NestRequest a -> IO (RedirectOrResponse a)
 sendRequest host req = do
-  let reqreq = setRequestHost host req
-  response <- httpLBS reqreq
+  let reqWithHost = setRequestHost host req
+  response <- httpLBS reqWithHost
   let status = getResponseStatusCode response
   let body = getResponseBody response
   return
-    (case status
-      --  200 ->
-      --    case eitherDecode' body of
-      --      (Left message) -> Left (ParseFailure (pack message))
-      --      (Right a)      -> (Right a)
-      --  s
-      --    | s >= 400 ->
-      --      case eitherDecode' body of
-      --        (Left message) -> Left (ParseFailure (pack message))
-      --        (Right a)      -> Left (ApiError (NestApiError status a))
-      --  _ -> Left (UnknownStatusCode status))
-           of
+    (case status of
        200 -> handleSuccess body
        301 -> handle301 response
        s

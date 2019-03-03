@@ -4,7 +4,7 @@ module Web.Nest.Lib
   ( doNestStuff
   ) where
 
-import           Data.IORef               (newIORef)
+import           Data.IORef               (newIORef, readIORef)
 import           Network.HTTP.Client
 import           Network.HTTP.Client.TLS  (setGlobalManager, tlsManagerSettings)
 import           Web.Nest.AccessToken     (getAccessToken)
@@ -14,9 +14,12 @@ import           Web.Nest.HttpClient.Base (nestHost)
 doNestStuff :: NestAuth -> IO ()
 doNestStuff nestAuth = do
   setUpHttpClient
+  accessToken <- getAccessToken nestAuth
   ref <- newIORef nestHost
-  accessToken <- getAccessToken ref nestAuth
   print accessToken
+  -- TODO: get thermostat data
+  currentHost <- readIORef ref
+  print currentHost
 
 setUpHttpClient :: IO ()
 setUpHttpClient = do

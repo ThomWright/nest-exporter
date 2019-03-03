@@ -13,18 +13,23 @@ import           Data.Text                   (Text)
 import           GHC.Generics
 import           Network.HTTP.Simple
 import           Web.Nest.HttpClient.Auth    (NestAuth (..))
-import           Web.Nest.HttpClient.Base    (defaultSecureRequest)
+import           Web.Nest.HttpClient.Base    (Host, defaultSecureRequest)
 import           Web.Nest.HttpClient.Request (NestRequest)
 
-nestOauthPath :: String
-nestOauthPath = "/oauth2"
+-- |This is a different host from the rest of the API
+nestOauthHost :: Host
+nestOauthHost = S8.pack "api.home.nest.com"
 
-nestAccessTokenPath :: String
-nestAccessTokenPath = nestOauthPath ++ "/access_token"
+nestOauthPath :: S8.ByteString
+nestOauthPath = S8.pack "/oauth2"
+
+nestAccessTokenPath :: S8.ByteString
+nestAccessTokenPath = nestOauthPath <> (S8.pack "/access_token")
 
 getAccessTokenReq :: NestAuth -> NestRequest AccessTokenResponseBody
 getAccessTokenReq NestAuth {clientId, clientSecret, code} =
-  setRequestPath (S8.pack nestAccessTokenPath) $
+  setRequestHost nestOauthHost $
+  setRequestPath nestAccessTokenPath $
   setRequestMethod "POST" $
   setRequestBodyURLEncoded
     [ ("client_id", S8.pack clientId)
