@@ -2,12 +2,14 @@
 {-# LANGUAGE NamedFieldPuns #-}
 
 module Web.Nest.HttpClient.AccessToken
-  ( getAccessTokenReq
+  ( AccessToken(..)
+  , getAccessTokenReq
   , AccessTokenResponseBody(..)
   ) where
 
-import           Data.Aeson                  (FromJSON, parseJSON, withObject,
-                                              (.:))
+import           Data.Aeson                  (FromJSON, ToJSON, Value (String),
+                                              parseJSON, toJSON, withObject,
+                                              withText, (.:))
 import qualified Data.ByteString.Char8       as S8
 import           Data.Text                   (Text)
 import           GHC.Generics
@@ -39,12 +41,23 @@ getAccessTokenReq NestAuth {clientId, clientSecret, code} =
     ]
     defaultSecureRequest
 
+newtype AccessToken =
+  AccessToken Text
+  deriving (Eq, Generic, Show)
+
+instance FromJSON AccessToken where
+  parseJSON = withText "AccessToken" $ pure . AccessToken
+
+instance ToJSON AccessToken where
+  toJSON (AccessToken t) = String t
+
 data AccessTokenResponseBody = AccessTokenResponseBody
-  { accessToken :: Text
+  { accessToken :: AccessToken
   , expiresIn   :: Int
   } deriving (Eq, Generic, Show)
 
 instance FromJSON AccessTokenResponseBody where
   parseJSON =
     withObject "AccessTokenResponseBody" $ \v ->
-      AccessTokenResponseBody <$> v .: "access_token" <*> v .: "expires_in"
+      AccessTokenResponseBody <$> (AccessToken <$> v .: "access_token") <*>
+      v .: "expires_in"

@@ -8,7 +8,8 @@ import           Data.Text                       (Text, pack)
 
 import           Network.HTTP.Client             (host)
 import           Web.Nest.FileCache              (withFileCache)
-import           Web.Nest.HttpClient.AccessToken (AccessTokenResponseBody (..),
+import           Web.Nest.HttpClient.AccessToken (AccessToken,
+                                                  AccessTokenResponseBody (..),
                                                   getAccessTokenReq)
 import           Web.Nest.HttpClient.Auth        (NestAuth)
 import           Web.Nest.HttpClient.Error       (NestError (..), body)
@@ -18,11 +19,11 @@ import           Web.Nest.HttpClient.Request     (RedirectOrResponse (..),
 accessTokenFile :: FilePath
 accessTokenFile = "access-token.json"
 
-getAccessToken :: NestAuth -> IO (Either Text Text)
+getAccessToken :: NestAuth -> IO (Either Text AccessToken)
 getAccessToken nestAuth =
   withFileCache accessTokenFile (getAccessTokenFromApi nestAuth)
 
-getAccessTokenFromApi :: NestAuth -> IO (Either Text Text)
+getAccessTokenFromApi :: NestAuth -> IO (Either Text AccessToken)
 getAccessTokenFromApi nestAuth = do
   let req = getAccessTokenReq nestAuth
   -- the access token request has its own host
