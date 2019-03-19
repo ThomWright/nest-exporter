@@ -1,6 +1,5 @@
 {-# LANGUAGE DeriveGeneric #-}
 
--- {-# LANGUAGE NamedFieldPuns #-}
 module Web.Nest.HttpClient.Thermostat
   ( path
   , getThermostatData
