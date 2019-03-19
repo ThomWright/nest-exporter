@@ -22,7 +22,7 @@ main = do
   configFile <- TIO.readFile filepath
   case parseIniFile configFile Config.parser of
     Left err -> putStrLn $ "Error parsing config file: " ++ err
-    Right config@AppConfig {nest = NestConfig { Config.clientId
+    Right AppConfig {nest = NestConfig { Config.clientId
                                               , Config.clientSecret
                                               , Config.pinCode
                                               }} -> do
