@@ -56,10 +56,6 @@ data ThermostatResponseBody = ThermostatResponseBody
   , eco_temperature_high_c      :: Float
   , eco_temperature_low_f       :: Float
   , eco_temperature_low_c       :: Float
-  , away_temperature_high_f     :: Float
-  , away_temperature_high_c     :: Float
-  , away_temperature_low_f      :: Float
-  , away_temperature_low_c      :: Float
   , hvac_mode                   :: String
   , previous_hvac_mode          :: String
   , ambient_temperature_f       :: Float
@@ -109,10 +105,6 @@ instance FromJSON ThermostatResponseBody where
       v .: "eco_temperature_high_c" <*>
       v .: "eco_temperature_low_f" <*>
       v .: "eco_temperature_low_c" <*>
-      v .: "away_temperature_high_f" <*>
-      v .: "away_temperature_high_c" <*>
-      v .: "away_temperature_low_f" <*>
-      v .: "away_temperature_low_c" <*>
       v .: "hvac_mode" <*>
       v .: "previous_hvac_mode" <*>
       v .: "ambient_temperature_f" <*>
