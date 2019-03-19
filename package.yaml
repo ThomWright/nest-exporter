@@ -31,8 +31,8 @@ dependencies:
 - http-types == 0.12.2
 - optparse-applicative == 0.14.3.0
 - text == 1.2.3.1
-# - transformers == 0.5.5.0
 - unordered-containers == 0.2.9.0
+- uri-bytestring == 0.3.2.1
 
 library:
   source-dirs: src

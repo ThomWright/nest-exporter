@@ -26,7 +26,7 @@ main = do
                                               , Config.clientSecret
                                               , Config.pinCode
                                               }} -> do
-      print config
+      -- print config
       doNestStuff (NestAuth clientId clientSecret pinCode)
 
 newtype CmdLineOptions = CmdLineOptions

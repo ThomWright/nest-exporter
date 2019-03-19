@@ -5,8 +5,6 @@ module Web.Nest.AccessToken
   ) where
 
 import           Data.Text                       (Text, pack)
-
-import           Network.HTTP.Client             (host)
 import           Web.Nest.FileCache              (withFileCache)
 import           Web.Nest.HttpClient.AccessToken (AccessToken,
                                                   AccessTokenResponseBody (..),
@@ -26,8 +24,7 @@ getAccessToken nestAuth =
 getAccessTokenFromApi :: NestAuth -> IO (Either Text AccessToken)
 getAccessTokenFromApi nestAuth = do
   let req = getAccessTokenReq nestAuth
-  -- the access token request has its own host
-  r <- sendRequest (host req) req
+  r <- sendRequest req
   case r of
     Redirect _ -> return (Left "Unexpected redirect while getting access token")
     Response response ->
